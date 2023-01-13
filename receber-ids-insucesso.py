@@ -9,7 +9,12 @@ import traceback
 from google_api_functions import *
 import os
 import re
-import numpy as np
+import json
+
+def carregarParametros():
+    with open("parametros.json", "r") as infile:
+        parametros = json.load(infile)
+    return parametros
 
 def subir_informacoes_googlesheets_pulando_linha(tabela):
     last_row = str(int(ultima_linha('1U-BmZ9k6Jk6Jrpi1MhDQNfpndbydyB8Qy0n3zkFxCVQ','PLANILHA!A1:A')))
@@ -294,11 +299,11 @@ def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_
                 input()
             pass
 
-profile_path = r'C:\Users\vdiassob\AppData\Roaming\Mozilla\Firefox\Profiles\eituekku.robo'
+profile_path = carregarParametros()['perfilFirefox']
 options = Options()
 options.add_argument("-profile")
 options.add_argument(profile_path)
-options.binary_location = r'C:\Program Files (x86)\Mozilla Firefox\firefox.exe'
+options.binary_location = carregarParametros()['caminhoFirefox']
 
 navegador = webdriver.Firefox(options=options)
 navegador.get("https://envios.mercadolivre.com.br/logistics/service-center/return-to-station")
