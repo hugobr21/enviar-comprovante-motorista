@@ -5,7 +5,6 @@ from selenium import webdriver
 import pandas as pd
 import urllib
 import time
-import datetime
 import traceback
 from google_api_functions import *
 import os
@@ -141,7 +140,11 @@ def salvar_ids_insucesso_do_dia_anterior(operador):
     lista_de_ids_do_dia_anterior = []
     while True:
         try:
-            if len(lista_de_ids_do_dia_anterior) > 0: print('\nIDs coletados:\n','\n'.join(lista_de_ids_do_dia_anterior))
+            os.system('cls')
+            try:
+                if len(lista_de_ids_do_dia_anterior) > 0: print('\nIDs coletados:\n','\n'.join(lista_de_ids_do_dia_anterior))
+            except:
+                pass
             id_coletor = input('\nBipe o ID do pacote ou digite s e aperte ENTER para sair: ')
             if id_coletor.upper() == 'S':
                 if input('\nTem certeza que deseja sair par ao menu principal(s/n)?: ').upper() == 'S': return True
@@ -149,13 +152,22 @@ def salvar_ids_insucesso_do_dia_anterior(operador):
             if id_coletor == '':
                 if input('\nDeseja finalizar a coleta de IDs(s/n)?: ').upper() == 'S': break
             id_coletor = re.search(r'4\d\d\d\d\d\d\d\d\d\d',id_coletor)[0]
-            lista_de_ids_do_dia_anterior.append(id_coletor)
+            navegador.get('https://envios.mercadolivre.com.br/logistics/management-packages/package/' + str(id_coletor))
+            if input('\nPara atrelar o status ao ID digite ENTER. Caso contrário digite s e pressione ENTER. ') == '':
+                for i in range(15):
+                    status_virado = navegador.find_elements(By.CLASS_NAME,'andes-dropdown__display-values')
+                    if len(status_virado) > 0:
+                        status_virado = navegador.find_elements(By.CLASS_NAME,'andes-dropdown__display-values')[0].text.strip()
+                        break
+                lista_de_ids_do_dia_anterior.append([id_coletor,status_virado])
         except:
-            time.sleep(1)
+            if debug_mode:
+                print(traceback.format_exc())
             print('ID/função invalida!')
+            time.sleep(1)
     
-    ids_a_receber = pd.DataFrame(lista_de_ids_do_dia_anterior, columns=['ID do envio'])
-    ids_a_receber['Status'] = ''
+    ids_a_receber = pd.DataFrame(lista_de_ids_do_dia_anterior, columns=['ID do envio','Status'])
+    # ids_a_receber['Status'] = ''
     ids_a_receber['Para'] = ''
     ids_a_receber['NOME COMPLETO DO MOTORISTA'] = nome_do_motorista
     ids_a_receber['TRANSPORTADORA'] = transportadora
@@ -169,7 +181,7 @@ def salvar_ids_insucesso_do_dia_anterior(operador):
     print(f'\nNome do motorista: {nome_do_motorista}')
     print(f'\nResponsável DHL: {operador}')
     print(f'\nTransportadora: {transportadora}')
-    input()
+    input('Pressione ENTER para continuar.')
 
     if input('Deseja armazenar esses pacotes na base do insucesso e enviar comprovante por whatsapp(s/n)? ').upper() == 'S':
         print('Armazenando pacotes na base do insucesso...')
@@ -278,8 +290,8 @@ def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_
             break
         except:
             if debug_mode:
-                input()
                 print(traceback.format_exc())
+                input()
             pass
 
 profile_path = r'C:\Users\vdiassob\AppData\Roaming\Mozilla\Firefox\Profiles\eituekku.robo'
@@ -317,6 +329,11 @@ while True:
         pass
 
 while True:
-    os.system('cls')
-    escolher_funcao(operador)
-exit()
+    try:
+        os.system('cls')
+        escolher_funcao(operador)
+    except:
+        if debug_mode:
+            print(traceback.format_exc())
+            input()
+        pass
