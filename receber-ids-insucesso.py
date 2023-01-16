@@ -77,9 +77,17 @@ def salvar_ids_insucesso_do_dia(operador):
         print('\n',tabela_info_motorista)
         if input('\nDeseja seguir o processo com este motorista (s/n)? ').upper() != 'S':
             return True
-    tabela_insucesso = navegador.find_elements(By.CLASS_NAME,'andes-table__row')
-    lista = [i.text for i in tabela_insucesso]
-    
+    while True:
+        tabela_insucesso = navegador.find_elements(By.CLASS_NAME,'andes-table__row')
+        lista = [i.text for i in tabela_insucesso]
+        if len(lista) < 1:
+            if input('Nenhum ID na lista de recebimento. Deseja repetir a pesquisa (s/n)?').upper() == 'S':
+                continue
+            else:
+                return True
+        else:
+            break
+
     # Tratar tabela de base de insucesso
     
     ids_a_receber = pd.DataFrame(lista[1:], columns=['ID do envio'])
