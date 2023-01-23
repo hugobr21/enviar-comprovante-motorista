@@ -18,7 +18,11 @@ class motorista:
     nome: str = ''
     transportadora: str = ''
     celular: str = ''
-
+    
+    def consultar_motorista(self):
+        """Realiza consulta de cadastros"""
+        pass
+    
     def realizar_cadastro(self):
         """Realiza cadastro de motoristas caso não esteja na base"""
 
@@ -62,12 +66,5 @@ class motorista:
         self.nome = input('Insira o nome completo do motorista: ').upper()
         return [[self.nome,self.transportadora,self.celular]]
 
-        def consultar_motorista(self):
-            """Realiza consulta de cadastros"""
-            pass
 
-# novo_motorista = motorista(celular='21997551436')
-novo_motorista = motorista()
-novo_motorista.realizar_cadastro()
-print(novo_motorista.__dict__)
 

@@ -29,15 +29,16 @@ def subir_informacoes_googlesheets_pulando_linha(tabela):
 def validar_informacoes_motorista(numero_do_motorista):
     for i in range(15):
         try:
-            cadastro_de_motoristas = get_values('1VLgkDoCc8i3MGPaWH8NBRATt9iXtwHo5ZZwmVKhoSsc',"'Respostas ao formulário 1'!A1:D")
+            cadastro_de_motoristas = get_values(carregarParametros()["idBaseDeCadastroDeMotoristasDoForms"],"'Respostas ao formulário 1'!A1:D")
+            cadastro_de_motoristas2 = get_values(carregarParametros()["idPlanilhaBase"],"'CADASTRO DE MOTORISTAS 2'!A1:C")
             break
         except:
             if debug_mode: print(traceback.format_exc())
-        try:
-            cadastro_de_motoristas2 = get_values('1U-BmZ9k6Jk6Jrpi1MhDQNfpndbydyB8Qy0n3zkFxCVQ',"'CADASTRO DE MOTORISTAS 2'!A1:C")
-            break
-        except:
-            if debug_mode: print(traceback.format_exc())
+        # try:
+        #     cadastro_de_motoristas2 = get_values(carregarParametros()["idPlanilhaBase"],"'CADASTRO DE MOTORISTAS 2'!A1:C")
+        #     break
+        # except:
+        #     if debug_mode: print(traceback.format_exc())
     cadastro_de_motoristas = pd.DataFrame(cadastro_de_motoristas[1:],columns=cadastro_de_motoristas[0])
     cadastro_de_motoristas2 = pd.DataFrame(cadastro_de_motoristas2[1:],columns=cadastro_de_motoristas2[0])
     cadastro_de_motoristas['NÚMERO DE WHATSAPP DO MOTORISTA'] = cadastro_de_motoristas['NÚMERO DE WHATSAPP (EXEMPLO: 21988888888)'].astype('str')
@@ -248,7 +249,7 @@ def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_
             texto = urllib.parse.quote(f"{mensagem}")
             link = f"https://web.whatsapp.com/send?phone={numero}&text={texto}"
             data_hora = time.strftime('%d/%m/%Y %H:%M')
-            last_row_logwhatsapp = str(int(ultima_linha('1U-BmZ9k6Jk6Jrpi1MhDQNfpndbydyB8Qy0n3zkFxCVQ',"'LOG WHATSAPP'!A1:C")))
+            last_row_logwhatsapp = str(int(ultima_linha(carregarParametros()["idPlanilhaBase"],"'LOG WHATSAPP'!A1:C")))
             tabela_log_whatsapp_upload = pd.DataFrame({'DATA':[data_hora]*(len(ids.split('\n'))),
             'ID': ids.split('\n'),
             'NÚMERO DE WHATSAPP MOTORISTA':[numero]*(len(ids.split('\n'))),
