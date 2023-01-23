@@ -33,8 +33,16 @@ def validar_informacoes_motorista(numero_do_motorista):
             break
         except:
             if debug_mode: print(traceback.format_exc())
+        try:
+            cadastro_de_motoristas2 = get_values('1U-BmZ9k6Jk6Jrpi1MhDQNfpndbydyB8Qy0n3zkFxCVQ',"'CADASTRO DE MOTORISTAS 2'!A1:C")
+            break
+        except:
+            if debug_mode: print(traceback.format_exc())
     cadastro_de_motoristas = pd.DataFrame(cadastro_de_motoristas[1:],columns=cadastro_de_motoristas[0])
+    cadastro_de_motoristas2 = pd.DataFrame(cadastro_de_motoristas2[1:],columns=cadastro_de_motoristas2[0])
+    cadastro_de_motoristas = pd.concat([cadastro_de_motoristas,cadastro_de_motoristas2])
     cadastro_de_motoristas['NÚMERO DE WHATSAPP DO MOTORISTA'] = cadastro_de_motoristas['NÚMERO DE WHATSAPP (EXEMPLO: 21988888888)'].astype('str')
+
     return cadastro_de_motoristas.loc[cadastro_de_motoristas['NÚMERO DE WHATSAPP DO MOTORISTA']==numero_do_motorista]
 
 def salvar_ids_insucesso_do_dia(operador):
