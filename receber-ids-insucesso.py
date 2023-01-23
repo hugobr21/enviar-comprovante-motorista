@@ -109,7 +109,7 @@ def salvar_ids_insucesso_do_dia(operador):
     ids_a_receber['DATA DE ENTREGA'] = time.strftime('%d/%m/%Y %H:%M:%S')
     ids_a_receber['PACOTE DO DIA'] = 'SIM'
     ids_a_receber['NÚMERO DE WHATSAPP DO MOTORISTA'] = numero_do_motorista
-    ids_a_receber = ids_a_receber.loc[ids_a_receber['Status'].str.strip() != 'Perdido']
+    ids_a_receber = ids_a_receber.loc[ids_a_receber['Status'].str.strip() != 'O pacote foi perdido Solução de problemas']
 
     os.system('cls')
     print('\n',ids_a_receber)
