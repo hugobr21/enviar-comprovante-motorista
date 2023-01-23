@@ -40,8 +40,8 @@ def validar_informacoes_motorista(numero_do_motorista):
             if debug_mode: print(traceback.format_exc())
     cadastro_de_motoristas = pd.DataFrame(cadastro_de_motoristas[1:],columns=cadastro_de_motoristas[0])
     cadastro_de_motoristas2 = pd.DataFrame(cadastro_de_motoristas2[1:],columns=cadastro_de_motoristas2[0])
-    cadastro_de_motoristas = pd.concat([cadastro_de_motoristas,cadastro_de_motoristas2])
     cadastro_de_motoristas['NÚMERO DE WHATSAPP DO MOTORISTA'] = cadastro_de_motoristas['NÚMERO DE WHATSAPP (EXEMPLO: 21988888888)'].astype('str')
+    cadastro_de_motoristas = pd.concat([cadastro_de_motoristas,cadastro_de_motoristas2])
 
     return cadastro_de_motoristas.loc[cadastro_de_motoristas['NÚMERO DE WHATSAPP DO MOTORISTA']==numero_do_motorista]
 
