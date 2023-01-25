@@ -237,8 +237,6 @@ def salvar_ids_insucesso_com_divergencia(operador):
             status_virado = f'PACOTE DIVERGENTE - {status_virado}'
             if id_coletor.upper() == 'S':
                 if input('\nTem certeza que deseja sair par ao menu principal(s/n)?: ').upper() == 'S': return True
-                pass
-
             id_coletor = re.search(r'4\d\d\d\d\d\d\d\d\d\d',id_coletor)[0]
             lista_de_ids_do_dia_anterior.append([id_coletor,status_virado])
         except:
@@ -250,8 +248,8 @@ def salvar_ids_insucesso_com_divergencia(operador):
     ids_a_receber = pd.DataFrame(lista_de_ids_do_dia_anterior, columns=['ID do envio','Status'])
     # ids_a_receber['Status'] = ''
     ids_a_receber['Para'] = ''
-    ids_a_receber['NOME COMPLETO DO MOTORISTA'] = nome_do_motorista
-    ids_a_receber['TRANSPORTADORA'] = transportadora
+    ids_a_receber['NOME COMPLETO DO MOTORISTA'] = instancia_motorista.nome
+    ids_a_receber['TRANSPORTADORA'] = instancia_motorista.transportadora
     ids_a_receber['RESPONSÁVEL DHL'] = operador
     ids_a_receber['DATA DE ENTREGA'] = time.strftime('%d/%m/%Y %H:%M:%S')
     ids_a_receber['PACOTE DO DIA'] = '-'
@@ -378,12 +376,12 @@ def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_
 
 
 # Configuração de teste
-# setup_programa = setupPrograma(idBaseDeCadastroDeMotoristasDoForms="1VLgkDoCc8i3MGPaWH8NBRATt9iXtwHo5ZZwmVKhoSsc",idPlanilhaBaseInsucesso="1novQK-fwCFoJl1ceWSd2-nJ6uSXm2_TXA7sqgvGNHmA")
+setup_programa = setupPrograma(idBaseDeCadastroDeMotoristasDoForms="1VLgkDoCc8i3MGPaWH8NBRATt9iXtwHo5ZZwmVKhoSsc",idPlanilhaBaseInsucesso="1novQK-fwCFoJl1ceWSd2-nJ6uSXm2_TXA7sqgvGNHmA",perfilFirefox="C:\\Users\\vdiassob\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\t947m7yh.recebimento-insucesso",caminhoFirefox="C:\\Program Files\\Mozilla Firefox\\firefox.exe")
 
 # Configuração de produção
-setup_programa = setupPrograma()
+# setup_programa = setupPrograma()
 
-setup_programa.carregar_parametros()
+# setup_programa.carregar_parametros()
 
 instancia_motorista = motorista()
 
