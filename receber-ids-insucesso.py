@@ -9,18 +9,13 @@ import traceback
 from google_api_functions import *
 import os
 import re
-import json
-
-def carregarParametros():
-    with open("parametros.json", "r") as infile:
-        parametros = json.load(infile)
-    return parametros
+from classes_insucesso import setupPrograma, motorista
 
 def subir_informacoes_googlesheets_pulando_linha(tabela):
-    last_row = str(int(ultima_linha('1U-BmZ9k6Jk6Jrpi1MhDQNfpndbydyB8Qy0n3zkFxCVQ','PLANILHA!A1:A')))
+    last_row = str(int(ultima_linha(setup_programa.idPlanilhaBaseInsucesso,'PLANILHA!A1:A')))
     for i in range(15):
         try:
-            update_values('1U-BmZ9k6Jk6Jrpi1MhDQNfpndbydyB8Qy0n3zkFxCVQ',f'PLANILHA!A{last_row}:H','USER_ENTERED',tabela.values.tolist())
+            update_values(setup_programa.idPlanilhaBaseInsucesso,f'PLANILHA!A{last_row}:H','USER_ENTERED',tabela.values.tolist())
             print('\nPacotes salvos!')
             break
         except:
@@ -29,13 +24,13 @@ def subir_informacoes_googlesheets_pulando_linha(tabela):
 def validar_informacoes_motorista(numero_do_motorista):
     for i in range(15):
         try:
-            cadastro_de_motoristas = get_values(carregarParametros()["idBaseDeCadastroDeMotoristasDoForms"],"'Respostas ao formulário 1'!A1:D")
-            cadastro_de_motoristas2 = get_values(carregarParametros()["idPlanilhaBase"],"'CADASTRO DE MOTORISTAS 2'!A1:C")
+            cadastro_de_motoristas = get_values(setup_programa.idBaseDeCadastroDeMotoristasDoForms,"'Respostas ao formulário 1'!A1:D")
+            cadastro_de_motoristas2 = get_values(setup_programa.idPlanilhaBaseInsucesso,"'CADASTRO DE MOTORISTAS 2'!A1:C")
             break
         except:
             if debug_mode: print(traceback.format_exc())
         # try:
-        #     cadastro_de_motoristas2 = get_values(carregarParametros()["idPlanilhaBase"],"'CADASTRO DE MOTORISTAS 2'!A1:C")
+        #     cadastro_de_motoristas2 = get_values(setup_programa.idPlanilhaBaseInsucesso,"'CADASTRO DE MOTORISTAS 2'!A1:C")
         #     break
         # except:
         #     if debug_mode: print(traceback.format_exc())
@@ -179,8 +174,12 @@ def salvar_ids_insucesso_do_dia_anterior(operador):
             if input('\nPara atrelar o status ao ID digite ENTER. Caso contrário digite s e pressione ENTER. ') == '':
                 for i in range(15):
                     status_virado = navegador.find_elements(By.CLASS_NAME,'andes-dropdown__display-values')
+                    status_virado2 = navegador.find_elements(By.CLASS_NAME,'andes-form-control__field')
                     if len(status_virado) > 0:
                         status_virado = navegador.find_elements(By.CLASS_NAME,'andes-dropdown__display-values')[0].text.strip()
+                        break
+                    if len(status_virado2) > 0:
+                        status_virado = navegador.find_elements(By.CLASS_NAME,'andes-form-control__field')[0].get_attribute('value').strip()
                         break
                 lista_de_ids_do_dia_anterior.append([id_coletor,status_virado])
         except:
@@ -215,11 +214,70 @@ def salvar_ids_insucesso_do_dia_anterior(operador):
         os.system('cls')
         return True
 
+def salvar_ids_insucesso_com_divergencia(operador):
+    os.system('cls')
+    tabela_info_motorista = validar_informacoes_motorista(instancia_motorista.validar_numero())
+    if len(tabela_info_motorista) < 1:
+        instancia_motorista.realizar_cadastro()
+    else:
+        instancia_motorista.transportadora = tabela_info_motorista['TRANSPORTADORA'].values[0]
+        instancia_motorista.nome = tabela_info_motorista['NOME COMPLETO DO MOTORISTA'].values[0].upper()
+    lista_de_ids_do_dia_anterior = []
+    while True:
+        try:
+            os.system('cls')
+            try:
+                if len(lista_de_ids_do_dia_anterior) > 0: print('\nIDs coletados:\n','\n'.join(lista_de_ids_do_dia_anterior))
+            except:
+                pass
+            id_coletor = input('\nBipe o ID do pacote ou digite s e aperte ENTER para sair: ')
+            if id_coletor == '':
+                if input('\nDeseja finalizar a coleta de IDs(s/n)?: ').upper() == 'S': break            
+            status_virado = input('\nExplique a divergência: ').upper().strip()
+            status_virado = f'PACOTE DIVERGENTE - {status_virado}'
+            if id_coletor.upper() == 'S':
+                if input('\nTem certeza que deseja sair par ao menu principal(s/n)?: ').upper() == 'S': return True
+                pass
+
+            id_coletor = re.search(r'4\d\d\d\d\d\d\d\d\d\d',id_coletor)[0]
+            lista_de_ids_do_dia_anterior.append([id_coletor,status_virado])
+        except:
+            if debug_mode:
+                print(traceback.format_exc())
+            print('ID ou função inválida!')
+            time.sleep(1)
+    
+    ids_a_receber = pd.DataFrame(lista_de_ids_do_dia_anterior, columns=['ID do envio','Status'])
+    # ids_a_receber['Status'] = ''
+    ids_a_receber['Para'] = ''
+    ids_a_receber['NOME COMPLETO DO MOTORISTA'] = nome_do_motorista
+    ids_a_receber['TRANSPORTADORA'] = transportadora
+    ids_a_receber['RESPONSÁVEL DHL'] = operador
+    ids_a_receber['DATA DE ENTREGA'] = time.strftime('%d/%m/%Y %H:%M:%S')
+    ids_a_receber['PACOTE DO DIA'] = '-'
+    ids_a_receber['NÚMERO DE WHATSAPP DO MOTORISTA'] = instancia_motorista.celular
+
+    
+    print('\n',ids_a_receber)
+    print(f'\nResponsável DHL: {operador}')
+    input('Pressione ENTER para continuar.')
+
+    if input('Deseja armazenar esses pacotes na base do insucesso (s/n)? ').upper() == 'S':
+        print('Armazenando pacotes na base do insucesso...')
+        subir_informacoes_googlesheets_pulando_linha(ids_a_receber[['DATA DE ENTREGA','ID do envio','NOME COMPLETO DO MOTORISTA','TRANSPORTADORA','PACOTE DO DIA','Status','RESPONSÁVEL DHL','NÚMERO DE WHATSAPP DO MOTORISTA']])
+        input('Pressione ENTER para continuar.')
+        instancia_motorista.__delattr__
+    else:
+        os.system('cls')
+        return True
+
 def escolher_funcao(operador):
     text_menu = '''Assistente do insucesso\n
     1 - Salvar pacotes de insucesso do dia anterior.\n
     2 - Salvar pacotes de insucesso do dia\n
+    3 - Salvar pacotes com divergência\n
     '''
+
     while True:
         os.system('cls')
         try:
@@ -232,6 +290,7 @@ def escolher_funcao(operador):
     
     if funcao == 1: salvar_ids_insucesso_do_dia_anterior(operador)
     if funcao == 2: salvar_ids_insucesso_do_dia(operador)
+    if funcao == 3: salvar_ids_insucesso_com_divergencia(operador)
 
 def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_whatsapp_motorista,listadeids):
     while True:
@@ -249,7 +308,7 @@ def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_
             texto = urllib.parse.quote(f"{mensagem}")
             link = f"https://web.whatsapp.com/send?phone={numero}&text={texto}"
             data_hora = time.strftime('%d/%m/%Y %H:%M')
-            last_row_logwhatsapp = str(int(ultima_linha(carregarParametros()["idPlanilhaBase"],"'LOG WHATSAPP'!A1:C")))
+            last_row_logwhatsapp = str(int(ultima_linha(setup_programa.idPlanilhaBaseInsucesso,"'LOG WHATSAPP'!A1:C")))
             tabela_log_whatsapp_upload = pd.DataFrame({'DATA':[data_hora]*(len(ids.split('\n'))),
             'ID': ids.split('\n'),
             'NÚMERO DE WHATSAPP MOTORISTA':[numero]*(len(ids.split('\n'))),
@@ -301,7 +360,7 @@ def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_
                 # grava o log de envio no google sheets
                 for i in range(20):
                     try:
-                        update_values('1U-BmZ9k6Jk6Jrpi1MhDQNfpndbydyB8Qy0n3zkFxCVQ',f"'LOG WHATSAPP'!A{last_row_logwhatsapp}:D",'USER_ENTERED',tabela_log_whatsapp_upload.values.tolist())
+                        update_values(setup_programa.idPlanilhaBaseInsucesso,f"'LOG WHATSAPP'!A{last_row_logwhatsapp}:D",'USER_ENTERED',tabela_log_whatsapp_upload.values.tolist())
                         break
                     except:
                         pass
@@ -317,11 +376,22 @@ def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_
                 input()
             pass
 
-profile_path = carregarParametros()['perfilFirefox']
+
+# Configuração de teste
+# setup_programa = setupPrograma(idBaseDeCadastroDeMotoristasDoForms="1VLgkDoCc8i3MGPaWH8NBRATt9iXtwHo5ZZwmVKhoSsc",idPlanilhaBaseInsucesso="1novQK-fwCFoJl1ceWSd2-nJ6uSXm2_TXA7sqgvGNHmA")
+
+# Configuração de produção
+setup_programa = setupPrograma()
+
+setup_programa.carregar_parametros()
+
+instancia_motorista = motorista()
+
+profile_path = setup_programa.perfilFirefox
 options = Options()
 options.add_argument("-profile")
 options.add_argument(profile_path)
-options.binary_location = carregarParametros()['caminhoFirefox']
+options.binary_location = setup_programa.caminhoFirefox
 
 navegador = webdriver.Firefox(options=options)
 navegador.get("https://envios.mercadolivre.com.br/logistics/service-center/return-to-station")
@@ -329,7 +399,9 @@ navegador.execute_script("window.open('');")
 navegador.switch_to.window(navegador.window_handles[1])
 navegador.get('https://web.whatsapp.com/')
 navegador.switch_to.window(navegador.window_handles[0])
+
 debug_mode = True
+
 
 while True:
     try:
