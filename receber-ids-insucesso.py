@@ -376,12 +376,12 @@ def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_
 
 
 # Configuração de teste
-setup_programa = setupPrograma(idBaseDeCadastroDeMotoristasDoForms="1VLgkDoCc8i3MGPaWH8NBRATt9iXtwHo5ZZwmVKhoSsc",idPlanilhaBaseInsucesso="1novQK-fwCFoJl1ceWSd2-nJ6uSXm2_TXA7sqgvGNHmA",perfilFirefox="C:\\Users\\vdiassob\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\t947m7yh.recebimento-insucesso",caminhoFirefox="C:\\Program Files\\Mozilla Firefox\\firefox.exe")
+# setup_programa = setupPrograma(idBaseDeCadastroDeMotoristasDoForms="1VLgkDoCc8i3MGPaWH8NBRATt9iXtwHo5ZZwmVKhoSsc",idPlanilhaBaseInsucesso="1novQK-fwCFoJl1ceWSd2-nJ6uSXm2_TXA7sqgvGNHmA",perfilFirefox="C:\\Users\\vdiassob\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\t947m7yh.recebimento-insucesso",caminhoFirefox="C:\\Program Files\\Mozilla Firefox\\firefox.exe")
 
 # Configuração de produção
-# setup_programa = setupPrograma()
+setup_programa = setupPrograma()
 
-# setup_programa.carregar_parametros()
+setup_programa.carregar_parametros()
 
 instancia_motorista = motorista()
 
