@@ -134,7 +134,7 @@ def get_values(spreadsheet_id, range_name):
         result = service.spreadsheets().values().get(
             spreadsheetId=spreadsheet_id, range=range_name).execute()
         rows = result.get('values', [])
-        print(f"{len(rows)} rows retrieved")
+        # print(f"{len(rows)} rows retrieved")
         return result["values"]
     except HttpError as error:
         print(f"An error occurred: {error}")

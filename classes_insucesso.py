@@ -66,15 +66,8 @@ class motorista:
         'ON TIME SERVIÇOS', 'PARCEIRO SPOT SOLUÇÕES', 'LOGISTICSEIRELI',
         'PRALOG', 'BEDENDO E VIANA', 'ME EXTRA', 'HELP', 'KANGU']
         
-        if self.celular == '':
-            while True:
-                self.celular = input('Insira o número de WhatsApp do motorista: ')
-                if len(self.celular) == 11 and self.celular[:2] == '21':
-                    break
-                else:
-                    print('Número inválido! Por favor, tente novamente')
-                    time.sleep(1)
-                    os.system('cls')
+        self.validar_numero()
+
         while True:
             try:
                 self.transportadora = lista_transportadoras[abs(int(input(f'{relacao_transportadoras}Insira o número correspondente à transportadora do motorista: ')))-1]

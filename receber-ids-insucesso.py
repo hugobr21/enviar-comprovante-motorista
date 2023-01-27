@@ -29,11 +29,6 @@ def validar_informacoes_motorista(numero_do_motorista):
             break
         except:
             if debug_mode: print(traceback.format_exc())
-        # try:
-        #     cadastro_de_motoristas2 = get_values(setup_programa.idPlanilhaBaseInsucesso,"'CADASTRO DE MOTORISTAS 2'!A1:C")
-        #     break
-        # except:
-        #     if debug_mode: print(traceback.format_exc())
     cadastro_de_motoristas = pd.DataFrame(cadastro_de_motoristas[1:],columns=cadastro_de_motoristas[0])
     cadastro_de_motoristas2 = pd.DataFrame(cadastro_de_motoristas2[1:],columns=cadastro_de_motoristas2[0])
     cadastro_de_motoristas['NÚMERO DE WHATSAPP DO MOTORISTA'] = cadastro_de_motoristas['NÚMERO DE WHATSAPP (EXEMPLO: 21988888888)'].astype('str')
@@ -172,13 +167,13 @@ def salvar_ids_insucesso_do_dia_anterior(operador):
             id_coletor = re.search(r'4\d\d\d\d\d\d\d\d\d\d',id_coletor)[0]
             navegador.get('https://envios.mercadolivre.com.br/logistics/management-packages/package/' + str(id_coletor))
             if input('\nPara atrelar o status ao ID digite ENTER. Caso contrário digite s e pressione ENTER. ') == '':
-                for i in range(15):
+                for _ in range(15):
                     status_virado = navegador.find_elements(By.CLASS_NAME,'andes-dropdown__display-values')
                     status_virado2 = navegador.find_elements(By.CLASS_NAME,'andes-form-control__field')
-                    if len(status_virado) > 0:
+                    if len(status_virado) > 0 and len(status_virado[0].text.strip()) > 1:
                         status_virado = navegador.find_elements(By.CLASS_NAME,'andes-dropdown__display-values')[0].text.strip()
                         break
-                    if len(status_virado2) > 0:
+                    if len(status_virado2) > 0 and len(status_virado2[0].text.strip()) > 1:
                         status_virado = navegador.find_elements(By.CLASS_NAME,'andes-form-control__field')[0].get_attribute('value').strip()
                         break
                 lista_de_ids_do_dia_anterior.append([id_coletor,status_virado])
@@ -264,7 +259,7 @@ def salvar_ids_insucesso_com_divergencia(operador):
         print('Armazenando pacotes na base do insucesso...')
         subir_informacoes_googlesheets_pulando_linha(ids_a_receber[['DATA DE ENTREGA','ID do envio','NOME COMPLETO DO MOTORISTA','TRANSPORTADORA','PACOTE DO DIA','Status','RESPONSÁVEL DHL','NÚMERO DE WHATSAPP DO MOTORISTA']])
         input('Pressione ENTER para continuar.')
-        instancia_motorista.__delattr__
+
     else:
         os.system('cls')
         return True
@@ -376,7 +371,12 @@ def enviar_comprovante_whatsapp(motorista,transportadora,responsavel_dhl,numero_
 
 
 # Configuração de teste
-# setup_programa = setupPrograma(idBaseDeCadastroDeMotoristasDoForms="1VLgkDoCc8i3MGPaWH8NBRATt9iXtwHo5ZZwmVKhoSsc",idPlanilhaBaseInsucesso="1novQK-fwCFoJl1ceWSd2-nJ6uSXm2_TXA7sqgvGNHmA",perfilFirefox="C:\\Users\\vdiassob\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\t947m7yh.recebimento-insucesso",caminhoFirefox="C:\\Program Files\\Mozilla Firefox\\firefox.exe")
+# setup_programa = setupPrograma(
+# idBaseDeCadastroDeMotoristasDoForms="1VLgkDoCc8i3MGPaWH8NBRATt9iXtwHo5ZZwmVKhoSsc",
+# idPlanilhaBaseInsucesso="1novQK-fwCFoJl1ceWSd2-nJ6uSXm2_TXA7sqgvGNHmA",
+# perfilFirefox="C:\\Users\\vdiassob\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\t947m7yh.recebimento-insucesso",
+# caminhoFirefox="C:\\Program Files\\Mozilla Firefox\\firefox.exe"
+# )
 
 # Configuração de produção
 setup_programa = setupPrograma()
