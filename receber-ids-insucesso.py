@@ -9,7 +9,7 @@ import traceback
 from google_api_functions import *
 import os
 import re
-from classes_insucesso import setupPrograma, motorista
+from minhas_funcoes.classes_insucesso import setupPrograma, motorista
 
 def subir_informacoes_googlesheets_pulando_linha(tabela):
     last_row = str(int(ultima_linha(setup_programa.idPlanilhaBaseInsucesso,'PLANILHA!A1:A')))
