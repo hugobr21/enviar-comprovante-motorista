@@ -1,5 +1,6 @@
 *.bat
 __pycache__
+minhas_funcoes\__pycache__
 *.json
 *.log
 Github
