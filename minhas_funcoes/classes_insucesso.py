@@ -8,7 +8,7 @@ import json
 class pacotesInsucesso:
     """Classe para lidar com informações de pacotes"""
 
-    id: list[str] = field(default_factory=list)
+    id_: list[str] = field(default_factory=list)
     status: list[str] = field(default_factory=list)
     para: list[str] = field(default_factory=list)
     data_de_entrega: list[str] = field(default_factory=list)
@@ -84,10 +84,10 @@ class motorista:
 class setupPrograma:
     """Classe para lidar com configurações do programa"""
 
-    idPlanilhaBaseInsucesso: str = ''
-    idBaseDeCadastroDeMotoristasDoForms: str = ''
-    perfilFirefox: str = ''
-    caminhoFirefox: str = ''
+    idPlanilhaBaseInsucesso: list[str] = field(default_factory=list)
+    idBaseDeCadastroDeMotoristasDoForms: list[str] = field(default_factory=list)
+    perfilFirefox: list[str] = field(default_factory=list)
+    caminhoFirefox: list[str] = field(default_factory=list)
 
     def configurar_parametros(self) -> None:
         """Define os parâmetros do programa"""

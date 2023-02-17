@@ -1,13 +1,14 @@
-from google_api_functions import get_values, update_values
-from dataclasses import dataclass
+from google_api_functions import get_values
+from dataclasses import dataclass, field
 import pandas as pd
 
 @dataclass
 class baseDeDadosGoogle:
     """Classe para lidar com bases de dados"""
 
-    baseDeMotoristas: object = ''
-    baseDeInsucesso: object = ''
+    baseDeMotoristas: object = None
+    baseDeInsucesso: object = None
+    idPlanilhaBaseInsucesso: list[str] = field(default_factory=list)
 
     def baixar_motoristas(self, idBaseDeCadastroDeMotoristasDoForms,idPlanilhaBaseInsucesso) -> object:
         """Baixa e consolida as bases de cadastro de motorista"""
@@ -15,7 +16,7 @@ class baseDeDadosGoogle:
         for _ in range(15):
             try:
                 cadastro_de_motoristas = get_values(idBaseDeCadastroDeMotoristasDoForms,"'Respostas ao formulário 1'!A1:D")
-                insucesso = get_values(idPlanilhaBaseInsucesso,"PLANILHA!A1:H")
+                insucesso = get_values(self.idPlanilhaBaseInsucesso,"PLANILHA!A1:H")
                 break
             except:
                 pass
@@ -36,12 +37,12 @@ class baseDeDadosGoogle:
         
         return self.baseDeMotoristas
 
-    def baixar_insucesso(self, idPlanilhaBaseInsucesso) -> object:
+    def baixar_insucesso(self) -> object:
         """Baixa a base de insucesso"""
 
         for _ in range(15):
             try:
-                insucesso = get_values(idPlanilhaBaseInsucesso,"PLANILHA!A1:H")
+                insucesso = get_values(self.idPlanilhaBaseInsucesso,"PLANILHA!A1:H")
                 break
             except:
                 pass
@@ -50,3 +51,8 @@ class baseDeDadosGoogle:
         self.baseDeInsucesso = insucesso
         
         return self.baseDeInsucesso
+
+    def subir_ids_de_insucesso(self, update_values) -> None:
+        """Sobe ids de insucesso com detalhes (ex: transportadora, responsável dhl)"""
+
+        update_values(self.idPlanilhaBaseInsucesso,f'PLANILHA!A{last_row}:H','USER_ENTERED',tabela.values.tolist())
