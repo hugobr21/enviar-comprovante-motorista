@@ -150,6 +150,8 @@ def salvar_ids_insucesso_do_dia_anterior(operador):
     else:
         transportadora = tabela_info_motorista['TRANSPORTADORA'].values[0]
         nome_do_motorista = tabela_info_motorista['NOME COMPLETO DO MOTORISTA'].values[0].upper()
+        if input('\nDeseja seguir o processo com este motorista (s/n)? ').upper() != 'S':
+            return True        
     lista_de_ids_do_dia_anterior = []
     while True:
         try:
@@ -168,14 +170,14 @@ def salvar_ids_insucesso_do_dia_anterior(operador):
             navegador.get('https://envios.mercadolivre.com.br/logistics/management-packages/package/' + str(id_coletor))
             if input('\nPara atrelar o status ao ID digite ENTER. Caso contrário digite s e pressione ENTER. ') == '':
                 for _ in range(15):
-                    status_virado = navegador.find_elements(By.CLASS_NAME,'andes-dropdown__display-values')
-                    status_virado2 = navegador.find_elements(By.CLASS_NAME,'andes-form-control__field')
-                    if len(status_virado) > 0 and len(status_virado[0].text.strip()) > 1:
-                        status_virado = navegador.find_elements(By.CLASS_NAME,'andes-dropdown__display-values')[0].text.strip()
+                    try:status_virado = navegador.find_elements(By.CLASS_NAME,'package-status-content')[0].find_elements(By.TAG_NAME,'input')[0].get_attribute('value')
+                    except:pass
+                    try:status_virado = navegador.find_elements(By.CLASS_NAME,'package-status-content')[0].find_elements(By.TAG_NAME,'button')[0].get_attribute('aria-label')
+                    except:pass
+                    if len(status_virado) > 0 and status_virado.strip() != '':
+                        status_virado = status_virado
                         break
-                    if len(status_virado2) > 0 and len(status_virado2[0].text.strip()) > 1:
-                        status_virado = navegador.find_elements(By.CLASS_NAME,'andes-form-control__field')[0].get_attribute('value').strip()
-                        break
+                    time.sleep(1)
                 lista_de_ids_do_dia_anterior.append([id_coletor,status_virado])
         except:
             if debug_mode:
