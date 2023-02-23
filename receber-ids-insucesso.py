@@ -162,7 +162,7 @@ def salvar_ids_insucesso_do_dia_anterior(operador):
                 pass
             id_coletor = input('\nBipe o ID do pacote ou digite s e aperte ENTER para sair: ')
             if id_coletor.upper() == 'S':
-                if input('\nTem certeza que deseja sair par ao menu principal(s/n)?: ').upper() == 'S': return True
+                if input('\nTem certeza que deseja sair para o menu principal(s/n)?: ').upper() == 'S': return True
                 pass
             if id_coletor == '':
                 if input('\nDeseja finalizar a coleta de IDs(s/n)?: ').upper() == 'S': break
