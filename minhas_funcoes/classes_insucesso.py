@@ -3,16 +3,126 @@ from dataclasses import field
 import time
 import os
 import json
+import pandas as pd
+import re
+
 
 @dataclass
 class pacotesInsucesso:
     """Classe para lidar com informações de pacotes"""
 
-    id_: list[str] = field(default_factory=list)
+    id_s: list[str] = field(default_factory=list)
     status: list[str] = field(default_factory=list)
     para: list[str] = field(default_factory=list)
     data_de_entrega: list[str] = field(default_factory=list)
     pacote_do_dia_vigente: list[str] = field(default_factory=list)
+    FINALIZAR: str = None
+    CANCELAR: str = None
+    
+    def limpar_dados_de_pacotes(self) -> None:
+        """Limpa dados de input de pacotes"""
+
+        self.id_s = []
+        self.status = []
+        self.para = []
+        self.data_de_entrega = []
+        self.pacote_do_dia_vigente = []
+
+    def coletar_pacotes(self) -> None:
+        """Coleta os pacotes validando código do id"""
+
+        os.system('cls')
+        input_coletor = input('Para cancelar a coleta e voltar ao menu principal digite CANCELAR e pressione ENTER.\nBipe o ID do pacote ou digite FINALIZAR e aperte ENTER para finalizar a coleta de IDs: ')
+        if input_coletor.strip().upper() == 'FINALIZAR': self.FINALIZAR = 'FINALIZAR'
+        if input_coletor.strip().upper() == 'CANCELAR': self.CANCELAR = 'CANCELAR'
+        elif str(type(re.search(r'4\d\d\d\d\d\d\d\d\d\d',input_coletor)))=="<class 'NoneType'>" and self.FINALIZAR != 'FINALIZAR' and self.CANCELAR != 'CANCELAR':
+            os.system('cls')
+            print('O ID escaneado ou a opção é invalida. Tente novamente.')
+            time.sleep(1)
+            self.coletar_pacotes()
+        elif str(type(re.search(r'4\d\d\d\d\d\d\d\d\d\d',input_coletor)))!="<class 'NoneType'>" and self.FINALIZAR != 'FINALIZAR' and self.CANCELAR != 'CANCELAR':
+             self.id_s += [re.search(r'4\d\d\d\d\d\d\d\d\d\d',input_coletor)[0]]
+
+    def coletar_pacotes_com_status_divergentes(self) -> str:
+        """Coleta status não convencional"""
+
+        self.FINALIZAR = None
+        self.CANCELAR = None
+
+        while True:
+            self.coletar_pacotes()
+            if self.FINALIZAR == 'FINALIZAR':
+                break
+            if self.CANCELAR == 'CANCELAR':
+                break
+            self.status += [f"PACOTE DIVERGENTE - {input('Explique a divergência: ')}".upper()]                
+
+    def consolidar_pacotes(self, nome, transportadora, operador, celular) -> None:
+        """Consolidar pacotes divergentes com status"""
+
+        ids_a_receber = pd.DataFrame({'ID do envio':self.id_s,'Status':self.status})
+        ids_a_receber['Para'] = ''
+        ids_a_receber['NOME COMPLETO DO MOTORISTA'] = nome
+        ids_a_receber['TRANSPORTADORA'] = transportadora
+        ids_a_receber['RESPONSÁVEL DHL'] = operador
+        ids_a_receber['DATA DE ENTREGA'] = time.strftime('%d/%m/%Y %H:%M:%S')
+        ids_a_receber['PACOTE DO DIA'] = '-'
+        ids_a_receber['NÚMERO DE WHATSAPP DO MOTORISTA'] = celular
+
+        return ids_a_receber
+
+@dataclass
+class interfaceDePrograma:
+    """Classe para lidar com interface com usuário"""
+
+    usuario: list[str] = field(default_factory=list)
+
+    def escolher_usuario(self) -> None:
+        """Escolher usuário para operar programa"""
+        
+        while True:
+            try:
+                os.system('cls')
+                text_operadores = '''\nRESPONSÁVEIS DHL
+                                        1 - LUANA MEDEIROS
+                                        2 - RODRIGO SALDANHA
+                                        3 - ULISSES
+                                        4 - RAFAEL BARROS
+                                        5 - RODRIGO LIMA
+                                        5 - FERNANDO JUNIOR\n                                        
+                                        '''
+                print(text_operadores)
+                operador_input = int(input('Digite o número correspondente do responsável DHL: '))
+                if operador_input > 5 or operador_input < 0:continue
+                lista_operadores = ['LUANA MEDEIROS','RODRIGO SALDANHA','ULISSES','RAFAEL BARROS','RODRIGO LIMA']
+                self.usuario = lista_operadores[operador_input-1]
+                break
+            except:
+                print('Opção invalida!')
+                pass
+
+    def menu_principal(self) -> None:
+        """Função para mostrar menu principal"""
+
+        text_menu = '''Assistente do insucesso\n
+            1 - Salvar pacotes de insucesso do dia anterior.\n
+            2 - Salvar pacotes de insucesso do dia\n
+            3 - Salvar pacotes com divergência\n
+            '''
+
+        while True:
+            os.system('cls')
+            try:
+                print(text_menu)
+                funcao = int(input('\nDigite o numero da função e pressione enter para iniciar o processo: '))
+                break
+            except:
+                print('Função incorreta.\n')
+                time.sleep(1)
+            
+            # if funcao == 1: salvar_ids_insucesso_do_dia_anterior(operador)
+            # if funcao == 2: salvar_ids_insucesso_do_dia(operador)
+            # if funcao == 3: self.coletar_pacotes_com_status_divergentes()
 
 @dataclass
 class motorista:
