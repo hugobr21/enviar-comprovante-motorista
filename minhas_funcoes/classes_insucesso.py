@@ -14,6 +14,7 @@ class pacotesInsucesso:
     id_s: list[str] = field(default_factory=list)
     status: list[str] = field(default_factory=list)
     para: list[str] = field(default_factory=list)
+
     data_de_entrega: list[str] = field(default_factory=list)
     pacote_do_dia_vigente: list[str] = field(default_factory=list)
     FINALIZAR: str = None
@@ -89,12 +90,12 @@ class interfaceDePrograma:
                                         3 - ULISSES
                                         4 - RAFAEL BARROS
                                         5 - RODRIGO LIMA
-                                        5 - FERNANDO JUNIOR\n                                        
+                                        6 - FERNANDO JUNIOR\n                                        
                                         '''
                 print(text_operadores)
                 operador_input = int(input('Digite o número correspondente do responsável DHL: '))
-                if operador_input > 5 or operador_input < 0:continue
-                lista_operadores = ['LUANA MEDEIROS','RODRIGO SALDANHA','ULISSES','RAFAEL BARROS','RODRIGO LIMA']
+                if operador_input > 6 or operador_input < 0:continue
+                lista_operadores = ['LUANA MEDEIROS','RODRIGO SALDANHA','ULISSES','RAFAEL BARROS','RODRIGO LIMA','FERNANDO JUNIOR']
                 self.usuario = lista_operadores[operador_input-1]
                 break
             except:
